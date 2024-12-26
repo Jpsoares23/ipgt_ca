@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include <Adafruit_LiquidCrystal.h>
 #include <Keypad.h>
+#include <arithmetic.cpp>
 
 // keypad_1
 
@@ -24,8 +25,8 @@ Keypad customKeypad_1 = Keypad(makeKeymap(keyMap_1), rowPins_1, colPins_1, ROWS_
 
 // keypad_2
 
-const byte ROWS_2 = 1;
-const byte COLS_2 = 4;
+const byte ROWS_2 = 1; // number of Rows in keypad_2
+const byte COLS_2 = 4; // number of Cols in keypad_2
 
 char keyMap_2[ROWS_2][COLS_2] = { // values in keypad_2
     {'B', 'O', 'D', 'H'}
