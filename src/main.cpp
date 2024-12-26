@@ -1,5 +1,6 @@
 // libraries
 #include <Arduino.h>
+#include <Adafruit_LiquidCrystal.h>
 #include <Keypad.h>
 
 // keypad_1
@@ -35,8 +36,18 @@ byte colPins_2[COLS_2] = {A0, A1, A2, A3}; // keypad_2 Cols Pin
 
 Keypad customKeypad_2 = Keypad(makeKeymap(keyMap_2), rowPins_2, colPins_2, ROWS_2, COLS_2); // keypad_2 object
 
+// LCD
+Adafruit_LiquidCrystal lcd_1(0); // LCD object
+
 void setup() {
   Serial.begin(9600);
+    
+  lcd_1.begin(16, 2); // start LCD
+  lcd_1.print("Calculator V1.0"); // print string in LCD
+  
+  delay(1000); // wait 1000ms
+  lcd_1.clear(); // clear LCD
+  lcd_1.print("Press a key..."); // print string in LCD
 }
 
 void loop() {
