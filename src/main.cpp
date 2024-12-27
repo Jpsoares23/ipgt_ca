@@ -1,4 +1,5 @@
 // libraries
+
 #include <Arduino.h>
 #include <Adafruit_LiquidCrystal.h>
 #include <Keypad.h>
@@ -38,7 +39,25 @@ byte colPins_2[COLS_2] = {A0, A1, A2, A3}; // keypad_2 Cols Pin
 Keypad customKeypad_2 = Keypad(makeKeymap(keyMap_2), rowPins_2, colPins_2, ROWS_2, COLS_2); // keypad_2 object
 
 // LCD
+
 Adafruit_LiquidCrystal lcd_1(0); // LCD object
+
+// keypad_1 and keypad_2 value storage
+
+String keyPadValue; // value in the keypad (accumulative)
+char base[1] = {}; // base currently in use for number system operation
+
+// keypad_1 key processing 
+
+void processKey(char key) {
+  keyPadValue += key; // add key to string keyPadValue
+  
+  lcd_1.clear(); // clear LCD
+  lcd_1.setCursor(0, 1); // set cursor led to 0 col and 1 row
+  lcd_1.print(keyPadValue); // print string in LCD
+  
+  delay(100); // wait 100ms
+}
 
 void setup() {
   Serial.begin(9600);
@@ -52,5 +71,25 @@ void setup() {
 }
 
 void loop() {
+  char key_1 = customKeypad_1.getKey(); // get the key clicked in keypad_1
+  char key_2 = customKeypad_2.getKey(); // get the key clicked in keypad_2
 
-}
+  if (key_1 or key_2) {
+    if (key_1) {
+      if (sizeof(base) / sizeof(base[0]) > 0){ // if base it's empty
+        processKey(key_1);
+      } else {
+        // needs to check if the value is in that base range
+      }
+    } else {
+      if (sizeof(base) / sizeof(base[0]) > 0){ // if base it's empty 
+        base[0]= key_2; // add selected base to the base array
+        lcd_1.clear(); // clear LCD
+        lcd_1.setCursor(0, 1); // set cursor led to 0 col and 1 row
+      }
+      else{
+        // base already exists need to do the conversion
+      }
+      }
+    }
+  }
