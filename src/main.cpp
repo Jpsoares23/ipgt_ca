@@ -42,22 +42,87 @@ Keypad customKeypad_2 = Keypad(makeKeymap(keyMap_2), rowPins_2, colPins_2, ROWS_
 
 Adafruit_LiquidCrystal lcd_1(0); // LCD object
 
-// keypad_1 and keypad_2 value storage
+// keypad_2 value storage
 
-String keyPadValue; // value in the keypad (accumulative)
 char base[1] = {}; // base currently in use for number system operation
 
 // keypad_1 key processing 
 
-void processKey(char key) {
-  keyPadValue += key; // add key to string keyPadValue
-  
-  lcd_1.clear(); // clear LCD
-  lcd_1.setCursor(0, 1); // set cursor led to 0 col and 1 row
-  lcd_1.print(keyPadValue); // print string in LCD
-  
-  delay(100); // wait 100ms
+String keyPadValue; // value in the keypad (accumulative)
+char lastOperator = 0;  // store the last operator (+, -, *, /)
+float operand1 = 0, operand2 = 0;
+
+float calculateResult(float op1, float op2, char oper) {
+    switch (oper) {
+        case '+': return add(op1, op2);
+        case '-': return subtract(op1, op2);
+        case '*': return multiply(op1, op2);
+        case '/': return divide(op1, op2);
+        case '^': return exponencial(op1, op2);
+        default: return 0;
+    }
 }
+
+
+void processKey(char key) {
+  if (isdigit(key) || key == '.') { // if the value is a number
+    if (key == '.' && keyPadValue.length() == 0) {
+          keyPadValue = "0."; // if empty, append "0."
+      }
+
+    keyPadValue += key; // add key to string keyPadValue
+    
+    lcd_1.clear(); // clear LCD
+    lcd_1.setCursor(0, 1); // set cursor led to 0 col and 1 row
+    lcd_1.print(keyPadValue); // print string in LCD
+    
+    delay(100); // wait 100ms
+  } else { // if the value is not a number
+    switch (key){
+      case '+': case '-': case '*': case '/': case '^': // if it's an operation
+        if (keyPadValue.length() > 0){ // if expression is entered, update operand1 and operator
+          operand1 = keyPadValue.toFloat(); // value in the LCD is stored in first operand
+          lastOperator = key; // set the operator
+          keyPadValue = ""; // clear for next operand
+          lcd_1.setCursor(0, 1); // set cursor led to 0 col and 1 row
+          lcd_1.print(String(operand1) + String(lastOperator)); // print string in LCD
+
+          delay(100); // wait 100ms
+        } else if (lastOperator != 0){ // if there is allready an operator change the operator
+          lastOperator = key; // set the operator
+          lcd_1.setCursor(0, 1); // set cursor led to 0 col and 1 row
+          lcd_1.print(String(operand1) + String(lastOperator)); // print string in LCD
+        }
+        break;
+
+      case '=': // evaluate when user presses "="
+        if (lastOperator && keyPadValue.length() > 0) {
+          operand2 = keyPadValue.toFloat(); // value in the LCD is stored in second operand
+          float result = calculateResult(operand1, operand2, lastOperator); // calculate result
+          keyPadValue = String(result); // Store result for display
+          lastOperator = 0; // Reset operator
+          lcd_1.clear(); // clear LCD
+          lcd_1.print(keyPadValue); // display result
+        } 
+        break;
+      
+      case 'A': // clear all
+        operand1 = 0; // set operand to 0
+        operand2 = 0; // set operand to 0
+        lastOperator = 0; // set operator to 0
+        keyPadValue = ""; // set value current on display stored to ""
+        lcd_1.clear(); // clear LCD
+        lcd_1.print("Cleared"); // display message in LCD
+        break;
+
+      case 'C': // soft clear
+        keyPadValue = ""; // set value current on display stored to ""
+        lcd_1.clear(); // clear LCD
+        lcd_1.print("Operand Cleared"); // display message in LCD
+        break;
+          }
+    }
+  }
 
 void setup() {
   Serial.begin(9600);
