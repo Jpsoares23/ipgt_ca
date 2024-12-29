@@ -1,14 +1,14 @@
 #ifndef ARITHMETIC_H
 #define ARITHMETIC_H
 
-int add(int a, int b);
+float add(float a, float b);
 
-int subtract(int a, int b);
+float subtract(float a, float b);
 
-int multiply(int a, int b);
+float multiply(float a, float b);
 
 double divide(double a, double b);
 
-int exponencial(int a, int b);
+float exponencial(float a, float b);
 
 #endif

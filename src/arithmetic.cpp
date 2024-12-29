@@ -1,14 +1,14 @@
 #include "arithmetic.h"
 
-int add(int a, int b) {
+float add(float a, float b) {
     return a + b;
 }
 
-int subtract(int a, int b) {
+float subtract(float a, float b) {
     return a - b;
 }
 
-int multiply(int a, int b) {
+float multiply(float a, float b) {
     return a * b;
 }
 
@@ -16,8 +16,9 @@ double divide(double a, double b) {
     return a / b;
 }
 
-int exponencial(int a, int b) {
-    int result = 1;
+// exponencial only handle int b >= 1
+float exponencial(float a, float b) { 
+    float result = 1;
 
     for (int i = 0; i < b; ++i) {
         result *= a;
