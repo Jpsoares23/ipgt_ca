@@ -1,5 +1,4 @@
-#ifndef ARITHMETIC_H
-#define ARITHMETIC_H
+#include "arithmetic.h"
 
 int add(int a, int b) {
     return a + b;
@@ -25,5 +24,3 @@ int exponencial(int a, int b) {
     }
     return result;
 }
-
-#endif

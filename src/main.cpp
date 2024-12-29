@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <Adafruit_LiquidCrystal.h>
 #include <Keypad.h>
-#include <arithmetic.cpp>
+#include "arithmetic.h"
 
 // keypad_1
 
