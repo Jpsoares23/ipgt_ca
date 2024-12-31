@@ -4,6 +4,7 @@
 #include <Adafruit_LiquidCrystal.h>
 #include <Keypad.h>
 #include "arithmetic.h"
+#include "conversion.h"
 
 // keypad_1
 

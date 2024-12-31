@@ -9,6 +9,6 @@ float multiply(float a, float b);
 
 double divide(double a, double b);
 
-float exponencial(float a, float b);
+long long exponencial(float a, float b);
 
 #endif

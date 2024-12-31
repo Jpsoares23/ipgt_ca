@@ -16,9 +16,9 @@ double divide(double a, double b) {
     return a / b;
 }
 
-// exponencial only handle int b >= 1
-float exponencial(float a, float b) { 
-    float result = 1;
+
+long long exponencial(float a, float b) { 
+    long long result = 1;
 
     for (int i = 0; i < b; ++i) {
         result *= a;
