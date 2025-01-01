@@ -14,7 +14,7 @@ long long conversionToDecimal(const char *num, int base)
     {
         int number = 0;
 
-        // convert the character into a number (consider base 10 for now)
+        // convert the character into a number
         if (num[i] >= '0' && num[i] <= '9')
         {
             number = num[i] - '0'; // Convert '0' to 0, '1' to 1, ..., '9' to 9
@@ -23,10 +23,6 @@ long long conversionToDecimal(const char *num, int base)
         else if (num[i] >= 'A' && num[i] <= 'F')
         {
             number = num[i] - 'A' + 10;
-        }
-        else if (num[i] >= 'a' && num[i] <= 'f')
-        {
-            number = num[i] - 'a' + 10;
         }
 
         // update the result with the weighted value (exponential power of base)
@@ -56,7 +52,7 @@ char *conversionFromDecimal(long long num, int base)
 
     result[idx] = '\0';
 
-    // Reverse the result to get the correct order
+    // reverse the result to get the correct order
     for (int i = 0; i < idx / 2; i++)
     {
         char temp = result[i];
