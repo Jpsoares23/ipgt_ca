@@ -172,37 +172,40 @@ void loop()
       else
       {
         // needs to check if the value is in that base range
-        if (base[0] == 'B') // base is set to binary
+        switch (base[0])
         {
+        case 'B':                           // base is set to binary
           if (key_1 == '0' || key_1 == '1') // can only use "01"
           {
             processKey(key_1); // process the key pressed
           }
-        }
-        else if (base[0] == 'O') // base is set to octal
-        {
+          break;
+
+        case 'O':                             // base is set to octal
           if ((key_1 >= '0' && key_1 <= '7')) // can only use "01234567"
           {
             processKey(key_1); // process the key pressed
           }
-        }
-        else if (base[0] == 'D') // base is set to decimal
-        {
+          break;
+
+        case 'D':                           // base is set to decimal
           if (key_1 >= '0' && key_1 <= '9') // can only use "0123456789"
           {
             processKey(key_1); // process the key pressed
           }
-        }
-        else if (base[0] == 'H') // base is set for hexadecimal
-        {
+          break;
+
+        case 'H':                                                               // base is set to hexadecimal
           if ((key_1 >= '0' && key_1 <= '9') || (key_1 >= 'A' && key_1 <= 'F')) // can only use "0123456789ABCDEF"
           {
             processKey(key_1); // process the key pressed
           }
+          break;
         }
       }
-    } else // using the keypad_2
-    { 
+    }
+    else // using the keypad_2
+    {
       if (base[0] == '\0') // if base it's empty
       {
         base[0] = key_2;       // add selected base to the base array
@@ -210,9 +213,56 @@ void loop()
         lcd_1.clear();         // clear LCD
         lcd_1.setCursor(0, 1); // set cursor led to 0 col and 1 row
       }
-      else
+      else // if base it's not empty
       {
-        // base already exists need to do the conversion
+        int befConv;   // value in mid conversion
+        int baseValue; // value of the base stored
+
+        switch (key_2)
+        {
+        case 'B':
+          baseValue = 2; // binary
+          break;
+        case 'O':
+          baseValue = 8; // octal
+          break;
+        case 'D':
+          baseValue = 10; // decimal
+          break;
+        case 'H':
+          baseValue = 16; // hexadecimal
+          break;
+        }
+
+        switch (base[0])
+        {
+        case 'B': // conversion from binary
+          befConv = conversionToDecimal(keyPadValue.c_str(), 2);
+          keyPadValue = conversionFromDecimal(befConv, baseValue);
+          lcd_1.clear();            // clear LCD
+          lcd_1.print(keyPadValue); // display result
+          break;
+
+        case 'O': // conversion from octal
+          befConv = conversionToDecimal(keyPadValue.c_str(), 8);
+          keyPadValue = conversionFromDecimal(befConv, baseValue);
+          lcd_1.clear();            // clear LCD
+          lcd_1.print(keyPadValue); // display result
+          break;
+
+        case 'D': // conversion from decimal
+          keyPadValue = conversionFromDecimal(keyPadValue.toInt(), baseValue);
+          lcd_1.clear();            // clear LCD
+          lcd_1.print(keyPadValue); // display result
+          break;
+
+        case 'H': // conversion from hexadecimal
+          befConv = conversionToDecimal(keyPadValue.c_str(), 16);
+          keyPadValue = conversionFromDecimal(befConv, baseValue);
+          lcd_1.clear();            // clear LCD
+          lcd_1.print(keyPadValue); // display result
+          break;
+        }
       }
     }
   }
