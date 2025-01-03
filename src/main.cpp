@@ -225,10 +225,39 @@ void loop()
           }
           break;
 
-        case 'H':                                                               // base is set to hexadecimal
-          if ((key_1 >= '0' && key_1 <= '9') || (key_1 >= 'A' && key_1 <= 'F')) // can only use "0123456789ABCDEF"
+        case 'H':        // base is set to hexadecimal
+          switch (key_1) // remap keypad values
           {
-            processKey(key_1); // process the key pressed
+          case '%':
+            keyPadValue += 'A';     // if the '%' key was pressed, remap it to hexadecimal 'A'
+            updateLCD(keyPadValue); // print string in LCD
+            break;
+          case '/':
+            keyPadValue += 'B';     // if the '/' key was pressed, remap it to hexadecimal 'B'
+            updateLCD(keyPadValue); // print string in LCD
+            break;
+          case '*':
+            keyPadValue += 'C';     // if the '*' key was pressed, remap it to hexadecimal 'C'
+            updateLCD(keyPadValue); // print string in LCD
+            break;
+          case '-':
+            keyPadValue += 'D';     // if the '-' key was pressed, remap it to hexadecimal 'D'
+            updateLCD(keyPadValue); // print string in LCD
+            break;
+          case '+':
+            keyPadValue += 'E';     // if the '+' key was pressed, remap it to hexadecimal 'E'
+            updateLCD(keyPadValue); // print string in LCD
+            break;
+          case '=':
+            keyPadValue += 'F';     // if the '=' key was pressed, remap it to hexadecimal 'F'
+            updateLCD(keyPadValue); // print string in LCD
+            break;
+          default:
+            // if the key is not one of the above, check if it's not a '.' or '^'
+            if (key_1 != '.' && key_1 != '^')
+            {
+              processKey(key_1); // process the key pressed
+            }
           }
           break;
         }
