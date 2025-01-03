@@ -5,6 +5,7 @@
 #include <Keypad.h>
 #include "arithmetic.h"
 #include "conversion.h"
+#include "utils.h"
 
 // keypad_1
 
@@ -73,19 +74,27 @@ float calculateResult(float op1, float op2, char oper)
 void processKey(char key)
 {
   if (isdigit(key) || key == '.')
-  { // if the value is a number
-    if (key == '.' && keyPadValue.length() == 0)
+  {                 // if the value is a number
+    if (key == '.') // if the key is '.'
     {
-      keyPadValue = "0."; // if empty, append "0."
+      if (keyPadValue.length() == 0) // check if there's nothing in the input
+      {
+        keyPadValue = "0"; // if empty, append "0"
+      }
+      else if (keyPadValue.indexOf('.') != -1) // check if there's already a '.' in the input
+      {
+        return; // permit only one '.' in the input
+      }
+      else if (lastOperator == '^')
+      {
+        return;
+      }
     }
 
-    keyPadValue += key; // add key to string keyPadValue
+    keyPadValue += key;
 
-    lcd_1.clear();            // clear LCD
-    lcd_1.setCursor(0, 1);    // set cursor led to 0 col and 1 row
-    lcd_1.print(keyPadValue); // print string in LCD
-
-    delay(100); // wait 100ms
+    updateLCD(keyPadValue); // print string in LCD
+    delay(100);             // wait 100ms
   }
   else
   { // if the value is not a number
@@ -97,48 +106,70 @@ void processKey(char key)
     case '/':
     case '^': // if it's an operation
       if (keyPadValue.length() > 0)
-      {                                                       // if expression is entered, update operand1 and operator
-        operand1 = keyPadValue.toFloat();                     // value in the LCD is stored in first operand
-        lastOperator = key;                                   // set the operator
-        keyPadValue = "";                                     // clear for next operand
-        lcd_1.setCursor(0, 1);                                // set cursor led to 0 col and 1 row
-        lcd_1.print(String(operand1) + String(lastOperator)); // print string in LCD
-
-        delay(100); // wait 100ms
+      {                                   // if expression is entered, update operand1 and operator
+        operand1 = keyPadValue.toFloat(); // value in the LCD is stored in first operand
+        lastOperator = key;               // set the operator
+        keyPadValue = "";                 // clear for next operand
+        if (operand1 != int(operand1))
+        {
+          updateLCD(String(operand1) + String(lastOperator)); // print string in LCD
+        }
+        else
+        {
+          updateLCD(String(int(operand1)) + String(lastOperator)); // print string in LCD
+        }
       }
       else if (lastOperator != 0)
-      {                                                       // if there is allready an operator change the operator
-        lastOperator = key;                                   // set the operator
-        lcd_1.setCursor(0, 1);                                // set cursor led to 0 col and 1 row
-        lcd_1.print(String(operand1) + String(lastOperator)); // print string in LCD
+      {                     // if there is allready an operator change the operator
+        lastOperator = key; // set the operator
+        if (operand1 != int(operand1))
+        {
+          updateLCD(String(operand1) + String(lastOperator)); // print string in LCD
+        }
+        else
+        {
+          updateLCD(String(int(operand1)) + String(lastOperator)); // print string in LCD
+        }
       }
       break;
 
     case '=': // evaluate when user presses "="
-      if (lastOperator && keyPadValue.length() > 0)
+      if (keyPadValue.toFloat() == 0 && keyPadValue.length() > 0)
+      {
+        keyPadValue = "";
+        updateLCD("Division by zero..."); // display message in LCD
+      }
+      else if (lastOperator && keyPadValue.length() > 0)
       {
         operand2 = keyPadValue.toFloat();                                 // value in the LCD is stored in second operand
         float result = calculateResult(operand1, operand2, lastOperator); // calculate result
         keyPadValue = String(result);                                     // Store result for display
         lastOperator = 0;                                                 // Reset operator
         lcd_1.clear();                                                    // clear LCD
-        lcd_1.print(keyPadValue);                                         // display result
+        if (result != int(result))                                        // check if the result have decimals or not
+        {
+          updateLCD(String(result)); // display result
+        }
+        else
+        {
+          updateLCD(String(int(result))); // display result
+        }
       }
       break;
 
-    case 'A':                 // clear all
-      operand1 = 0;           // set operand to 0
-      operand2 = 0;           // set operand to 0
-      lastOperator = 0;       // set operator to 0
-      keyPadValue = "";       // set value current on display stored to ""
-      lcd_1.clear();          // clear LCD
-      lcd_1.print("Cleared"); // display message in LCD
+    case 'A':               // clear all
+      operand1 = 0;         // set operand to 0
+      operand2 = 0;         // set operand to 0
+      lastOperator = 0;     // set operator to 0
+      keyPadValue = "";     // set value current on display stored to ""
+      base[0] = '\0';       // resets base
+      updateLCD("Cleared"); // display message in LCD
       break;
 
-    case 'C':                         // soft clear
-      keyPadValue = "";               // set value current on display stored to ""
-      lcd_1.clear();                  // clear LCD
-      lcd_1.print("Operand Cleared"); // display message in LCD
+    case 'C':                       // soft clear
+      keyPadValue = "";             // set value current on display stored to ""
+      base[0] = '\0';               // resets base
+      updateLCD("Operand Cleared"); // display message in LCD
       break;
     }
   }
@@ -149,11 +180,10 @@ void setup()
   Serial.begin(9600);
 
   lcd_1.begin(16, 2);             // start LCD
-  lcd_1.print("Calculator V1.0"); // print string in LCD
+  lcd_1.print("Calculator V1.0"); // display message in LCD
 
-  delay(1000);                   // wait 1000ms
-  lcd_1.clear();                 // clear LCD
-  lcd_1.print("Press a key..."); // print string in LCD
+  delay(1000);                 // wait 1000ms
+  updateLCD("Press a key..."); // display message in LCD
 }
 
 void loop()
@@ -239,28 +269,28 @@ void loop()
         case 'B': // conversion from binary
           befConv = conversionToDecimal(keyPadValue.c_str(), 2);
           keyPadValue = conversionFromDecimal(befConv, baseValue);
-          lcd_1.clear();            // clear LCD
-          lcd_1.print(keyPadValue); // display result
+          base[0] = '\0';         // resets base
+          updateLCD(keyPadValue); // print string in LCD
           break;
 
         case 'O': // conversion from octal
           befConv = conversionToDecimal(keyPadValue.c_str(), 8);
           keyPadValue = conversionFromDecimal(befConv, baseValue);
-          lcd_1.clear();            // clear LCD
-          lcd_1.print(keyPadValue); // display result
+          base[0] = '\0';         // resets base
+          updateLCD(keyPadValue); // print string in LCD
           break;
 
         case 'D': // conversion from decimal
           keyPadValue = conversionFromDecimal(keyPadValue.toInt(), baseValue);
-          lcd_1.clear();            // clear LCD
-          lcd_1.print(keyPadValue); // display result
+          base[0] = '\0';         // resets base
+          updateLCD(keyPadValue); // print string in LCD
           break;
 
         case 'H': // conversion from hexadecimal
           befConv = conversionToDecimal(keyPadValue.c_str(), 16);
           keyPadValue = conversionFromDecimal(befConv, baseValue);
-          lcd_1.clear();            // clear LCD
-          lcd_1.print(keyPadValue); // display result
+          base[0] = '\0';         // resets base
+          updateLCD(keyPadValue); // print string in LCD
           break;
         }
       }
